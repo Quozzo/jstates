@@ -10,7 +10,10 @@ function unsubscribe(fn) {
 
 function setState(getState) {
 	this.state = typeof getState === 'function' ? getState(this.state) : getState
-	return Promise.all(this.subscribers.map(sub => sub(this.state)))
+	return this.subscribers.reduce(
+		(prev, sub) => prev.then(() => sub(this.state)),
+		Promise.resolve()
+	)
 }
 
 function createState(initialState) {
